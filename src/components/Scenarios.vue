@@ -1,13 +1,14 @@
 <template>
     <div>
         Select a season to filter the list
-        <select v-model="selectedSeason" @change="setSeason">
+        <select class="custom-select custom-select-sm mb-3" style="{width: 18rem}" v-model="selectedSeason" @change="setSeason">
+            <option value="">All Seasons</option>
             <option 
-                v-for="n in 11"
+                v-for="n in 12"
                 :key="n"
-                v-bind:value="n-1"
+                v-bind:value="n < 12 ? n-1 : n"
             >
-                Season {{n - 1}}
+                Season {{n-1}}
             </option>
         </select>
         <!-- <div class="dropdown">
@@ -70,11 +71,14 @@ export default {
     computed: {
         scenarios() {
             const { scenarios } = this.$store.state.scenarios;
-            if(this.selectedSeason !== undefined){
+            if(!!this.selectedSeason || this.selectedSeason === 0){
                 return scenarios.filter(scenario => scenario.season == this.selectedSeason).sort((a, b) => a.scen_num - b.scen_num);
             } else {
                 return scenarios
             }
+        },
+        seasonName(n) {
+            return n < 12 ? `Season ${n - 1}` : `All seasons`
         }
     },
     mutations: {

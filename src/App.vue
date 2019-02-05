@@ -20,7 +20,8 @@ export default {
             'fetchAlignments',
             'fetchClasses',
             'fetchRaces',
-            'fetchScenarios'
+            'fetchScenarios',
+            'fetchPlayers'
         ])
     },
     created() {
@@ -29,6 +30,7 @@ export default {
         this.fetchRaces();
         this.fetchAlignments();
         this.fetchScenarios();
+        this.fetchPlayers();
     }
 }
 </script>

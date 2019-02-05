@@ -5,6 +5,7 @@ import alignments from '../modules/alignments';
 import classes from '../modules/classes';
 import races from '../modules/races';
 import scenarios from '../modules/scenarios';
+import players from '../modules/players';
 
 Vue.use(Vuex);
 
@@ -15,5 +16,6 @@ export default new Vuex.Store({
         classes,
         races,
         scenarios,
+        players,
     }
 })
