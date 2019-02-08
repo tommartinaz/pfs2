@@ -1,48 +1,36 @@
-import axios from 'axios';
-
-const ROOT_URL = "http://localhost:8000";
+import character from './characters';
+import scenario from './scenarios';
+import alignment from './alignmnets';
+import clss from './classes';
+import race from './races';
+import player from './players';
 
 export default {
     // FETCH
-    fetchCharacters() {
-        return axios.get(`${ROOT_URL}/characters`);
-    },
-    fetchAlignments() {
-        return axios.get(`${ROOT_URL}/alignments`);
-    },
-    fetchClasses() {
-        return axios.get(`${ROOT_URL}/classes`);
-    },
-    fetchRaces() {
-        return axios.get(`${ROOT_URL}/races`);
-    },
-    fetchScenarios() {
-        return axios.get(`${ROOT_URL}/scenarios`);
-    },
-    fetchScenariosPlayedByCharacter(id) {
-        return axios.get(`${ROOT_URL}/characters/${id}/scenarios`);
-    },
-    fetchPlayers() {
-        return axios.get(`${ROOT_URL}/players`);
-    },
+    fetchCharacters: character.fetchCharacters,
+    fetchAlignments: alignment.fetchAlignments,
+    fetchClasses: clss.fetchClasses,
+    fetchRaces: race.fetchRaces,
+    fetchScenarios: scenario.fetchScenarios,
+    fetchPlayers: player.fetchPlayers,
+    fetchPlayedScenarios: scenario.fetchPlayedScenarios,
+
+    // FETCH ONE
+    fetchOnePlayer: player.fetchOnePlayer,
 
     // CREATE
 
-    addScenario(scenario) {
-        return axios.post(`${ROOT_URL}/scenarios`, scenario);
-    },
-    createCharacter(character) {
-        return axios.post(`${ROOT_URL}/characters`, character);
-    },
+    createScenario: scenario.createScenario,
+    createCharacter: character.createCharacter,
+    createPlayer: player.createPlayer,
 
     // EDIT
 
-    editCharacter(char) {
-        const { id, character } = char;
-        return axios.post(`${ROOT_URL}/characters/${id}`, character);
-    },
+    editCharacter: character.editCharacter,
+    editScenario: scenario.editScenario,
 
-    deleteCharacter(id) {
-        return axios.delete(`${ROOT_URL}/characters/${id}`)
-    },
+    // DELETE
+
+    deleteCharacter: character.deleteCharacter,
+    deleteScenario: scenario.deleteScenario,
 };
