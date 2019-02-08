@@ -186,7 +186,7 @@ export default {
             selectedSeason: null,
             totalRows: 0,
             itemsPerPageOptions: [ 10, 30, 50 ],
-            selectedPlayer: ""
+            selectedPlayer: {}
         }
 
     },
