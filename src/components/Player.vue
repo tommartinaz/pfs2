@@ -41,6 +41,14 @@
                 </template>
                 <template slot="row-details" slot-scope="row">
                     <b-card>
+                        <b-btn
+                            v-b-modal.modalPlayedScenarios
+                            v-b-modal.modal-center
+                            @click="lookupScenariosPlayedList(row.item.id)"
+                            class="create-btn mt-2 px-2">
+                            Scenarios played
+                        </b-btn>
+
                         <b-row class="mb-2">
                             <b-col sm="3" class="text-sm-right">Alignment</b-col>
                             <b-col>{{ lookupAlignment(row.item.alignment_id) }}</b-col>
@@ -137,6 +145,14 @@
                 />
             </form>
         </b-modal>
+        <b-modal id="modalPlayedScenarios" title="Scenarios Played" ref="modal">
+            <b-table
+                v-if="scenariosPlayedByChar.length"
+                :items="scenariosPlayedByChar"
+                :fields="scenarioFields"
+            />
+            <div v-else>No scenarios played</div>
+        </b-modal>
     </b-container>
 </template>
 
@@ -163,7 +179,13 @@ export default {
                 level: 1,
                 player_id: "",
                 character_num: 0,
-            }
+            },
+            scenarioFields: [
+                { key: 'season', sortable: true },
+                { key: 'scen_num' },
+                { key: 'title' }
+            ],
+            scenariosPlayedByChar: [],
         }
     },
     computed: {
@@ -248,8 +270,16 @@ export default {
             if(confirm(`Are you sure you want to delete ${this.player.name}?`)) {
                 // console.log(this.$route.params.id);
             }
-        }
-
+        },
+        lookupScenariosPlayedList(id) {
+            const { scenarios, playedScenarios } = this.$store.state.scenarios
+            const listOfScenIds = playedScenarios.filter(scenario => scenario.char_id === id).map(scenario => ({id: scenario.scen_id}));
+            const listOfScenariosPlayed = [];
+            for(let i = 0; i < listOfScenIds.length; i++) {
+                listOfScenariosPlayed.push(scenarios.find(scenario => scenario.id == listOfScenIds[i].id))
+            }
+            this.scenariosPlayedByChar = listOfScenariosPlayed;
+        },
     },
     created() {
         this.$store.dispatch('fetchOnePlayer', this.$route.params.id);
