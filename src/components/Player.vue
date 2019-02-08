@@ -41,17 +41,16 @@
                 </template>
                 <template slot="row-details" slot-scope="row">
                     <b-card>
-                        <b-btn
-                            v-b-modal.modalPlayedScenarios
-                            v-b-modal.modal-center
-                            @click="lookupScenariosPlayedList(row.item.id)"
-                            class="create-btn mt-2 px-2">
-                            Scenarios played
-                        </b-btn>
-
                         <b-row class="mb-2">
                             <b-col sm="3" class="text-sm-right">Alignment</b-col>
                             <b-col>{{ lookupAlignment(row.item.alignment_id) }}</b-col>
+                            <b-btn
+                                v-b-modal.modalPlayedScenarios
+                                v-b-modal.modal-center
+                                @click="lookupScenariosPlayedList(row.item.id)"
+                                class="create-btn mt-2 px-2">
+                                Scenarios played
+                            </b-btn>
                         </b-row>
                         <b-row class="mb-2">
                             <b-col sm="3" class="text-sm-right">Race</b-col>
