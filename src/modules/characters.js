@@ -2,12 +2,16 @@ import api from '../api';
 
 const state = {
     characters: [],
-    character: {}
+    scenariosPlayed: [],
+    availableScenarios: []
 };
 
 const getters = {
     allCharacters(state) {
         return state.characters;
+    },
+    scenariosPlayed(state) {
+        return state.scenariosPlayed;
     }
 };
 
@@ -21,13 +25,13 @@ const mutations = {
     addCharacter(state, character) {
         state.characters.push(character);
     },
-    editCharacter(character) {
+    editChar(state, character) {
         const resultsToSplice = state.characters;
         const found = resultsToSplice.find(char => char.id === character.id);
         const index = resultsToSplice.indexOf(found);
-        resultsToSplice.splice(index, character);
+        resultsToSplice.splice(index, 1, character);
         state.characters = resultsToSplice;
-    }
+    },
 };
 
 const actions = {
@@ -41,11 +45,11 @@ const actions = {
     },
     async editCharacter({ commit }, character) {
         const response = await api.editCharacter(character);
-        commit('editCharacter', response.data[0])
+        commit('editChar', response.data[0])
     },
     async deleteCharacter({ commit }, id) {
-        await api.deleteCharacter(id);
-        commit('deleteChar', id)
+        await api.deleteCharacter(id)
+            .then(commit('deleteChar', id))
     },
 }
 

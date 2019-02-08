@@ -1,15 +1,5 @@
 <template>
     <b-container fluid id="character-list" class="flex-cols pr-2 pl-2">
-        <b-row no-gutters>
-            <b-col cols="12" class="create-btn-row">
-                <b-btn
-                    v-b-modal.modalCharacter
-                    v-b-modal.modal-center
-                    class="create-btn mt-2 px-2">
-                    Create New Character
-                </b-btn>
-            </b-col>
-        </b-row>
         <b-row no-gutters class="mt-3">
             <b-col cols="12">
                 <b-table
@@ -33,12 +23,17 @@
                             <b-row class="mb-2">
                                 <b-col sm="3" class="text-sm-right">Player</b-col>
                                 <b-col>{{ lookupPlayer(row.item.player_id) }}</b-col>
-                                <b-col>{{ row.item.isActive }}</b-col>
+                                <b-btn
+                                    v-b-modal.modalPlayedScenarios
+                                    v-b-modal.modal-center
+                                    @click="lookupScenariosPlayedList(row.item.id)"
+                                    class="create-btn mt-2 px-2">
+                                    Scenarios played
+                                </b-btn>
                             </b-row>
                             <b-row class="mb-2">
                                 <b-col sm="3" class="text-sm-right">Alignment</b-col>
                                 <b-col>{{ lookupAlignment(row.item.alignment_id) }}</b-col>
-                                <b-col>{{ row.item.isActive }}</b-col>
                             </b-row>
                             <b-row class="mb-2">
                                 <b-col sm="3" class="text-sm-right">Race</b-col>
@@ -55,11 +50,12 @@
                                 <b-col>{{ row.item.level }}</b-col>
                                 <b-col>{{ row.item.isActive }}</b-col>
                             </b-row>
+
                         </b-card>
                     </template>
                     <template slot="edit" slot-scope="row">
                         <i 
-                            class="fa fa-pencil-square-o"
+                            class="fas fa-pen-square"
                             style="color:blue; display: flex; justify-content: center;"
                             aria-hidden="true"
                             v-b-modal.modalCharacter
@@ -69,7 +65,7 @@
                     </template>
                     <template slot="delete" slot-scope="row">
                         <i 
-                            class="fa fa-trash-o"
+                            class="far fa-trash-alt"
                             style="color:red; display: flex; justify-content: center;"
                             aria-hidden="true"
                             @click="deleteCharacter(row.item)"
@@ -136,6 +132,14 @@
                 />
             </form>
         </b-modal>
+        <b-modal id="modalPlayedScenarios" title="Scenarios Played" ref="modal">
+            <b-table
+                v-if="scenariosPlayedByChar.length"
+                :items="scenariosPlayedByChar"
+                :fields="seasonFields"
+            />
+            <div v-else>No scenarios played</div>
+        </b-modal>
     </b-container>
 </template>
 
@@ -162,6 +166,13 @@ export default {
                 { key: 'edit'},
                 { key: 'delete', sortable: false },
             ],
+            seasonFields: [
+                { key: 'season', sortable: true },
+                { key: 'scen_num' },
+                { key: 'title' }
+            ],
+            scenariosPlayedByChar: [],
+            availableScenarios: []
         }
     },
     computed: {
@@ -196,18 +207,6 @@ export default {
         characters() {
             return this.$store.state.characters.characters;
         },
-        players() {
-            return this.$store.state.players.players;
-        },
-        alignments() {
-            return this.$store.state.alignments.alignments;
-        },
-        races() {
-            return this.$store.state.races.races;
-        },
-        classes() {
-            return this.$store.state.classes.classes;
-        }
     },
     methods: {
         loadCharacterEdit(char) {
@@ -229,7 +228,7 @@ export default {
             if(!this.character.id) {
                 this.$store.dispatch('createCharacter', charToSubmit);
             } else {
-                this.$store.dispatch('editCharacter', {id: id, character: charToSubmit});
+                this.$store.dispatch('editCharacter', { ...charToSubmit, id: id });
             }
             this.clearCharacter();
         },
@@ -261,7 +260,21 @@ export default {
             const { players } = this.$store.state.players;
             const player = players.length ? players.find(plyr => plyr.id === id) : {};
             return player ? player["name"] : ""
-        }
+        },
+        lookupScenariosPlayedList(id) {
+            const { scenarios, playedScenarios } = this.$store.state.scenarios
+            const listOfScenIds = playedScenarios.filter(scenario => scenario.char_id === id).map(scenario => ({id: scenario.scen_id}));
+            const listOfScenariosPlayed = [];
+            for(let i = 0; i < listOfScenIds.length; i++) {
+                listOfScenariosPlayed.push(scenarios.find(scenario => scenario.id == listOfScenIds[i].id))
+            }
+            this.scenariosPlayedByChar = listOfScenariosPlayed;
+        },
+        // lookupAvailableScenarios(id) {
+        //     console.log("PLAYER ID", id);
+        //     const { scenarios, playedScenarios } = this.$store.state.scenarios;
+        //     const listOfScenarioIds = scenarios.filter(scenario => scenario)
+        // }
 
     },
 }

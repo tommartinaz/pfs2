@@ -21,7 +21,8 @@ export default {
             'fetchClasses',
             'fetchRaces',
             'fetchScenarios',
-            'fetchPlayers'
+            'fetchPlayers',
+            'fetchPlayedScenarios'
         ])
     },
     created() {
@@ -31,6 +32,7 @@ export default {
         this.fetchAlignments();
         this.fetchScenarios();
         this.fetchPlayers();
+        this.fetchPlayedScenarios();
     }
 }
 </script>
