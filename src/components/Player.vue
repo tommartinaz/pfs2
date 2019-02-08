@@ -33,7 +33,55 @@
                 :fields="characterFields"
                 v-if="characters.length"
                 sort-by="character_num"
-            />
+            >
+                <template slot="show_details" slot-scope="row">
+                    <b-button size="sm" @click.stop="row.toggleDetails" clss="mr-2">
+                        {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+                    </b-button>
+                </template>
+                <template slot="row-details" slot-scope="row">
+                    <b-card>
+                        <b-row class="mb-2">
+                            <b-col sm="3" class="text-sm-right">Alignment</b-col>
+                            <b-col>{{ lookupAlignment(row.item.alignment_id) }}</b-col>
+                        </b-row>
+                        <b-row class="mb-2">
+                            <b-col sm="3" class="text-sm-right">Race</b-col>
+                            <b-col>{{ lookupRace(row.item.race_id) }}</b-col>
+                            <b-col>{{ row.item.isActive }}</b-col>
+                        </b-row>
+                        <b-row class="mb-2">
+                            <b-col sm="3" class="text-sm-right">Class</b-col>
+                            <b-col>{{ lookupClass(row.item.class_id) }}</b-col>
+                            <b-col>{{ row.item.isActive }}</b-col>
+                        </b-row>
+                        <b-row class="mb-2">
+                            <b-col sm="3" class="text-sm-right">Level</b-col>
+                            <b-col>{{ row.item.level }}</b-col>
+                            <b-col>{{ row.item.isActive }}</b-col>
+                        </b-row>
+
+                    </b-card>
+                </template>
+                <template slot="edit" slot-scope="row">
+                    <i 
+                        class="fas fa-pen-square"
+                        style="color:blue; display: flex; justify-content: center;"
+                        aria-hidden="true"
+                        v-b-modal.modalCharacter
+                        v-b-modal.modal-center
+                        @click="loadCharacterEdit(row.item)"
+                    />
+                </template>
+                <template slot="delete" slot-scope="row">
+                    <i 
+                        class="far fa-trash-alt"
+                        style="color:red; display: flex; justify-content: center;"
+                        aria-hidden="true"
+                        @click="deleteCharacter(row.item)"
+                    />
+                </template>
+            </b-table>
         </b-row>
         <b-modal 
             id="modalCharacter"
@@ -44,11 +92,14 @@
         >
             <form @submit.stop.prevent="handleSubmit">
                 <b-form-input
-                    class="mb-3 character-id"
+                    class="mb-3 id-field"
                     type="text"
                     v-model="character.id"
                 />
-                <p>Player ID</p>
+                <b-form-input
+                    class="id-field"
+                    v-model="character.player_id"
+                />
                 <p>Character Number</p>
                 <b-form-input
                     type="text"
@@ -96,9 +147,12 @@ export default {
     data() {
         return {
             characterFields: [
-                { key: 'character_num', sortable: true, label: 'Character Number' },
+                { key: 'character_num', sortable: true, label: 'Character Number', 'class': 'text-center' },
                 { key: 'name', sortable: true },
-                { key: 'level', sortable: true }
+                { key: 'level', sortable: true },
+                { key: 'show_details', 'class': 'text-center' },
+                { key: 'edit', 'class': 'text-center' },
+                { key: 'delete', 'class': 'text-center'}
             ],
             character: {
                 id: "",
@@ -204,5 +258,7 @@ export default {
 </script>
 
 <style scoped>
-
+.id-field {
+    display: none;
+}
 </style>
