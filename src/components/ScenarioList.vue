@@ -68,7 +68,8 @@
                         />
                     </template>
                     <template slot="delete" slot-scope="row">
-                        <i 
+                        <i
+                            v-if="row.item.played_by"
                             class="far fa-trash-alt"
                             style="color:red; display: flex; justify-content: center;"
                             aria-hidden="true"
@@ -91,7 +92,11 @@
         <b-modal id="scenarioView"
             ref="modal"
             :title="`${scen.season}-${scen.scen_num}: ${scen.title}`"
-        >
+        >   <b-form-group>
+                <b-btn v-b-modal.markAsPlayed v-b-modal.modal-center>
+                    Mark as played.
+                </b-btn>
+            </b-form-group>
             <p>Levels {{scen.low_level}} - {{scen.high_level}}</p>
             <p>{{scen.description}}</p>
         </b-modal>
@@ -102,49 +107,53 @@
             :ok-disabled="!validateForm"
             @hidden="clearScenario"
         >
-        <b-container fluid>
-            <b-form-input class="scenario-id" v-model="scenarioToEditOrCreate.id" />
-            <p>Title</p>
-            <b-form-input
-                class="mb-3"
-                :state="titleState"
-                v-model="scenarioToEditOrCreate.title"
-                aria-describedby="titleFeedack"
-                placeholder="Title of Scenario"
-            />
-            <b-form-invalid-feedback id="titleFeedback">
-                The title must be at least 10 characters.
-            </b-form-invalid-feedback>
-            <b-form-row>
-            Season
-            <b-form-input
-                class="mb-2"
-                v-model="scenarioToEditOrCreate.season"
-                placeholder="Season number"
-            />
-            Scenario Number
-            <b-form-input
-                class="mb-2"
-                v-model="scenarioToEditOrCreate.scen_num"
-            />
-            </b-form-row>
-            Lowest level of character
-            <b-form-input
-                class="mb-3"
-                v-model="scenarioToEditOrCreate.low_level"
-            />
-            Highest level of character
-            <b-form-input
-                class="mb-3"
-                v-model="scenarioToEditOrCreate.high_level"
-            />
-            Description
-            <b-form-input
-                v-model="scenarioToEditOrCreate.description"
-                :state="descriptionState"
-                placeholder="The scenario must have a description."
-            />
-        </b-container>
+            <b-container fluid>
+                <b-form-input class="scenario-id" v-model="scenarioToEditOrCreate.id" />
+                <p>Title</p>
+                <b-form-input
+                    class="mb-3"
+                    :state="titleState"
+                    v-model="scenarioToEditOrCreate.title"
+                    aria-describedby="titleFeedack"
+                    placeholder="Title of Scenario"
+                />
+                <b-form-invalid-feedback id="titleFeedback">
+                    The title must be at least 10 characters.
+                </b-form-invalid-feedback>
+                <b-form-row>
+                Season
+                <b-form-input
+                    class="mb-2"
+                    v-model="scenarioToEditOrCreate.season"
+                    placeholder="Season number"
+                />
+                Scenario Number
+                <b-form-input
+                    class="mb-2"
+                    v-model="scenarioToEditOrCreate.scen_num"
+                />
+                </b-form-row>
+                Lowest level of character
+                <b-form-input
+                    class="mb-3"
+                    v-model="scenarioToEditOrCreate.low_level"
+                />
+                Highest level of character
+                <b-form-input
+                    class="mb-3"
+                    v-model="scenarioToEditOrCreate.high_level"
+                />
+                Description
+                <b-form-input
+                    v-model="scenarioToEditOrCreate.description"
+                    :state="descriptionState"
+                    placeholder="The scenario must have a description."
+                />
+            </b-container>
+        </b-modal>
+        <b-modal id="markAsPlayed" @ok="markPlayed(selectedCharacter, selectedPlayer, scen)">
+            <b-form-select :options="characters"  v-model="selectedCharacter">
+            </b-form-select>
         </b-modal>
     </b-container>
 </template>
@@ -186,7 +195,9 @@ export default {
             selectedSeason: null,
             totalRows: 0,
             itemsPerPageOptions: [ 10, 30, 50 ],
-            selectedPlayer: {}
+            selectedPlayer: {},
+            selectedCharacter: '',
+            selectedScenario: ''
         }
 
     },
@@ -249,6 +260,14 @@ export default {
             }))
             return seasonOptions;
         },
+        characters() {
+            const { characters } = this.$store.state.characters;
+            const playerCharacters = characters.filter(character => character.player_id === this.selectedPlayer);
+            return playerCharacters.map(character => ({
+                value: character.id,
+                text: character.name
+            }))
+        }
 
     },
     methods: {
@@ -286,10 +305,12 @@ export default {
             this.scenarioToEditOrCreate = this.$store.state.scenarios.scenarios.filter(scenario => scenario.id === selectedScenario.id)[0]
         },
         deleteScenario(scenario) {
-            if(confirm(`Are you sure you want to delete ${scenario.title}?`)) {
-                this.$store.dispatch('deleteScenario', scenario.id);
-                this.selectedSeason = null;
-            }
+            console.log(this.selectedPlayer, scenario);
+            this.$store.dispatch('removePlayed', { player_id: this.selectedPlayer, scen_id: scenario.id })
+            // if(confirm(`Are you sure you want to delete ${scenario.title}?`)) {
+            //     this.$store.dispatch('deleteScenario', scenario.id);
+            //     this.selectedSeason = null;
+            // }
         },
         onSeasonSelection(scenarios) {
             this.totalRows = scenarios.length;
@@ -306,7 +327,13 @@ export default {
                 return null;
             }
         },
+        markPlayed(character, player, scenario) {
+            this.$store.dispatch('markPlayed', {char_id: character, player_id: player, scen_id: scenario.id});
+        }
 
+    },
+    beforeUpdate() {
+        console.log("UPDATED")
     }
 }
 </script>
