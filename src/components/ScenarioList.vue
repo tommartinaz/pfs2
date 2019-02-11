@@ -68,7 +68,8 @@
                         />
                     </template>
                     <template slot="delete" slot-scope="row">
-                        <i 
+                        <i
+                            v-if="row.item.played_by"
                             class="far fa-trash-alt"
                             style="color:red; display: flex; justify-content: center;"
                             aria-hidden="true"
@@ -150,8 +151,8 @@
                 />
             </b-container>
         </b-modal>
-        <b-modal id="markAsPlayed">
-            <b-form-select :options="characters">
+        <b-modal id="markAsPlayed" @ok="markPlayed(selectedCharacter, selectedPlayer, scen)">
+            <b-form-select :options="characters"  v-model="selectedCharacter">
             </b-form-select>
         </b-modal>
     </b-container>
@@ -194,7 +195,9 @@ export default {
             selectedSeason: null,
             totalRows: 0,
             itemsPerPageOptions: [ 10, 30, 50 ],
-            selectedPlayer: {}
+            selectedPlayer: {},
+            selectedCharacter: '',
+            selectedScenario: ''
         }
 
     },
@@ -259,7 +262,6 @@ export default {
         },
         characters() {
             const { characters } = this.$store.state.characters;
-            console.log(characters, this.selectedPlayer);
             const playerCharacters = characters.filter(character => character.player_id === this.selectedPlayer);
             return playerCharacters.map(character => ({
                 value: character.id,
@@ -303,10 +305,12 @@ export default {
             this.scenarioToEditOrCreate = this.$store.state.scenarios.scenarios.filter(scenario => scenario.id === selectedScenario.id)[0]
         },
         deleteScenario(scenario) {
-            if(confirm(`Are you sure you want to delete ${scenario.title}?`)) {
-                this.$store.dispatch('deleteScenario', scenario.id);
-                this.selectedSeason = null;
-            }
+            console.log(this.selectedPlayer, scenario);
+            this.$store.dispatch('removePlayed', { player_id: this.selectedPlayer, scen_id: scenario.id })
+            // if(confirm(`Are you sure you want to delete ${scenario.title}?`)) {
+            //     this.$store.dispatch('deleteScenario', scenario.id);
+            //     this.selectedSeason = null;
+            // }
         },
         onSeasonSelection(scenarios) {
             this.totalRows = scenarios.length;
@@ -323,7 +327,13 @@ export default {
                 return null;
             }
         },
+        markPlayed(character, player, scenario) {
+            this.$store.dispatch('markPlayed', {char_id: character, player_id: player, scen_id: scenario.id});
+        }
 
+    },
+    beforeUpdate() {
+        console.log("UPDATED")
     }
 }
 </script>
