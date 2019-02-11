@@ -57,6 +57,17 @@ const actions = {
     async deleteScenario({ commit }, id) {
         await api.deleteScenario(id)
             .then(commit('deleteScenario', id))
+    },
+    async markPlayed({ commit }, session) {
+        const sessionDetails = {
+            char_id: session.char_id,
+            player_id: session.player_id,
+            scen_id: session.scen_id
+        };
+        await api.markPlayed(sessionDetails)
+    },
+    async removePlayed({ commit }, session) {
+        await api.removePlayed({player_id: session.player_id, scen_id: session.scen_id});
     }
 }
 
