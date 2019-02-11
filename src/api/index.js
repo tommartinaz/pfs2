@@ -28,9 +28,11 @@ export default {
 
     editCharacter: character.editCharacter,
     editScenario: scenario.editScenario,
+    markPlayed: scenario.markPlayed,
 
     // DELETE
 
     deleteCharacter: character.deleteCharacter,
     deleteScenario: scenario.deleteScenario,
+    removePlayed: scenario.removePlayed,
 };
