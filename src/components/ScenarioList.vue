@@ -298,19 +298,12 @@ export default {
             }
         },
         markPlayed(character, player, scenario) {
-            console.log(character, player, scenario);
             this.$store.dispatch('markPlayed', {char_id: character, player_id: player, scen_id: scenario.id});
         },
         removePlayed(scenarioId) {
             this.$store.dispatch('removePlayed', { player_id: this.player_id, scen_id: scenarioId })
         },
     },
-    beforeUpdate() {
-        console.log("BEFORE UPDATE", this.player_id, this.isLoggedIn);
-    },
-    updated() {
-        console.log("UPDATED", this.player_id, this.isLoggedIn);
-    }
 }
 </script>
 
