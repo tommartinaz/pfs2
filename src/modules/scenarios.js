@@ -64,7 +64,6 @@ const actions = {
             player_id: playedSession.player_id,
             scen_id: playedSession.scen_id
         };
-        console.log(playedSession);
         await api.markPlayed(sessionDetails)
     },
     async updatePlayed({}, session) {
