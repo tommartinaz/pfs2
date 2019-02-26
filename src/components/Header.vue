@@ -3,14 +3,14 @@
 
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-        <b-navbar-brand href="/">PFS Character Tracker</b-navbar-brand>
+        <b-navbar-brand :to="{ name: 'homeLink' }" router-tag="li" style="cursor: pointer">PFS Character Tracker</b-navbar-brand>
 
         <b-collapse is-nav id="nav_collapse">
 
             <b-navbar-nav>
-                <b-nav-item :to="{ name: 'homeLink' }" router-tag="li">Home</b-nav-item>
-                <b-nav-item :to="{ name: 'characterListLink' }" router-tag="li">Characters</b-nav-item>
-                <b-nav-item :to="{ name: 'scenarioListLink' }" router-tag="li">Scenarios</b-nav-item>
+                <b-nav-item :to="{ name: 'homeLink' }" router-tag="li" style="cursor: pointer">Home</b-nav-item>
+                <b-nav-item :to="{ name: 'characterListLink' }" router-tag="li" style="cursor: pointer">Characters</b-nav-item>
+                <b-nav-item :to="{ name: 'scenarioListLink' }" router-tag="li" style="cursor: pointer">Scenarios</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
