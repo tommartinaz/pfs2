@@ -10,5 +10,8 @@ export default {
     },
     createPlayer(player) {
         return axios.post(`${ROOT_URL}/players`, player);
+    },
+    login(credentials) {
+        return axios.post('http://localhost:8000/login', credentials);
     }
 }
