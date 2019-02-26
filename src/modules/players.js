@@ -50,11 +50,12 @@ const actions = {
         const response = await api.loginPlayer(credentials);
         commit('setPlayer', response.data);
         window.localStorage.setItem('player_id', response.data.id);
-        router.push('/characters')
+        router.push('/')
     },
     logoutPlayer({ commit }) {
         commit('logoutPlayer');
-        window.localStorage.removeItem('player_id')
+        window.localStorage.removeItem('player_id');
+        router.push('/');
     }
 };
 
