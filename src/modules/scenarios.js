@@ -58,15 +58,24 @@ const actions = {
         await api.deleteScenario(id)
             .then(commit('deleteScenario', id))
     },
-    async markPlayed({ commit }, session) {
+    async markPlayed({}, playedSession) {
+        const sessionDetails = {
+            char_id: playedSession.char_id,
+            player_id: playedSession.player_id,
+            scen_id: playedSession.scen_id
+        };
+        console.log(playedSession);
+        await api.markPlayed(sessionDetails)
+    },
+    async updatePlayed({}, session) {
         const sessionDetails = {
             char_id: session.char_id,
             player_id: session.player_id,
             scen_id: session.scen_id
         };
-        await api.markPlayed(sessionDetails)
+        await api.updatePlayed(sessionDetails);
     },
-    async removePlayed({ commit }, session) {
+    async removePlayed({}, session) {
         await api.removePlayed({player_id: session.player_id, scen_id: session.scen_id});
     }
 }
