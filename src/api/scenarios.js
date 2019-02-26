@@ -22,8 +22,10 @@ export default {
         return axios.post(`${ROOT_URL}/markPlayed`, sessionDetails);
     },
     removePlayed(sessionDetails) {
-        console.log("API", sessionDetails)
         const { player_id, scen_id } = sessionDetails;
         return axios.delete(`${ROOT_URL}/scenariosPlayed/${player_id}/${scen_id}`)
+    },
+    updatePlayed(sessionDetails) {
+        return axios.post(`${ROOT_URL}/updatePlayed`, sessionDetails);
     }
 }
