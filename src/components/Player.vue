@@ -267,7 +267,7 @@ export default {
         },
         deletePlayer() {
             if(confirm(`Are you sure you want to delete ${this.player.name}?`)) {
-                // console.log(this.$route.params.id);
+                this.$store.dispatch('deletePlayer', this.player.id);
             }
         },
         lookupScenariosPlayedList(id) {
