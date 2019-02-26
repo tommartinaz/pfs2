@@ -1,17 +1,14 @@
 <template>
     <b-container fluid id="scenario-list" class="flex-cols pr-2 pl-2">
         <b-row no-gutters>
-            <b-col cols="6">
-                <b-form-group style="text-align: right;" horizontal label="Select a player" label-for="seasonSelect">
-                    <b-form-select
-                        id="playerSelect"
-                        :options="players"
-                        :value="players.id"
-                        class="mb-3"
-                        v-model="selectedPlayer"    
-                    >
-                    </b-form-select>
-                </b-form-group>
+            <b-col cols="6" class="create-btn-row">
+                <b-btn
+                    v-b-modal.modalScenarioCreate
+                    v-b-modal.modal-center
+                    v-if="player_id"
+                    class="create-btn mt-2 px-2">
+                    Create New Scenario
+                </b-btn>
             </b-col>
             <b-col cols="6">
                 <b-form-group style="text-align: right;" horizontal label="Filter by season" label-for="seasonSelect">
@@ -26,16 +23,6 @@
             </b-col>
         </b-row>
         <b-row no-gutters>
-            <b-col cols="6" class="create-btn-row">
-                <b-btn
-                    v-b-modal.modalScenarioCreate
-                    v-b-modal.modal-center
-                    class="create-btn mt-2 px-2">
-                    Create New Scenario
-                </b-btn>
-            </b-col>
-        </b-row>
-        <b-row no-gutters>
             <b-col cols="12">
                 <b-table
                     stacked="lg"
@@ -47,6 +34,7 @@
                     :fields="fields"
                     :current-page="currentPage"
                     :per-page="perPage"
+                    v-if="scenarios"
                 >
                     <template slot="show_details" slot-scope="row">
                         <i 
@@ -73,7 +61,7 @@
                             class="far fa-trash-alt"
                             style="color:red; display: flex; justify-content: center;"
                             aria-hidden="true"
-                            @click="deleteScenario(row.item)"
+                            @click="removePlayed(row.item.id)"
                         />
                     </template>
                 </b-table>
@@ -151,7 +139,7 @@
                 />
             </b-container>
         </b-modal>
-        <b-modal id="markAsPlayed" @ok="markPlayed(selectedCharacter, selectedPlayer, scen)">
+        <b-modal id="markAsPlayed" @ok="markPlayed(selectedCharacter, player_id, scen)">
             <b-form-select :options="characters"  v-model="selectedCharacter">
             </b-form-select>
         </b-modal>
@@ -159,6 +147,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
     name: "ScenarioList",
     data() {
@@ -195,13 +184,15 @@ export default {
             selectedSeason: null,
             totalRows: 0,
             itemsPerPageOptions: [ 10, 30, 50 ],
-            selectedPlayer: {},
             selectedCharacter: '',
-            selectedScenario: ''
+            selectedScenario: '',
+            selectedPlayer: {},
+            player_id: window.localStorage.getItem('player_id')
         }
 
     },
     computed: {
+        ...mapGetters(['isLoggedIn']),
         titleState() {
             return this.scenarioToEditOrCreate.title.length >= 10 ? true : false;
         },
@@ -210,15 +201,6 @@ export default {
         },
         validateForm() {
             return this.titleState && this.descriptionState;
-        },
-        players() {
-            const { players } = this.$store.state.players;
-            const playerList = players.map(player => ({
-                value: player.id,
-                text: player.name
-            }))
-            
-            return playerList;
         },
         scenarios() {
             const { selectedSeason } = this;
@@ -229,20 +211,16 @@ export default {
             } else {
                 scenarioList = scenarios
             }
-            const scenarioListWithNames = scenarioList.map(scenario => {
-                const character = this.lookupCharacter(scenario.id, this.selectedPlayer);
+            const scenarioListWithNames = this.isLoggedIn ? scenarioList.map(scenario => {
+                const character = this.lookupCharacter(scenario.id, this.player_id);
                 return {
                     ...scenario,
                     "played_by": character ? character: null,
                     "_rowVariant": character ? 'danger' : 'success',
                 }
-            })
+            }) : scenarioList;
             this.onSeasonSelection(scenarioList);
             return scenarioListWithNames;
-        },
-        markedUpScenarios() {
-            const newList = this.scenarios;
-            return [...newList]
         },
         seasons() {
             const listOfSeasons = [];
@@ -262,7 +240,7 @@ export default {
         },
         characters() {
             const { characters } = this.$store.state.characters;
-            const playerCharacters = characters.filter(character => character.player_id === this.selectedPlayer);
+            const playerCharacters = characters.filter(character => character.player_id === this.player_id);
             return playerCharacters.map(character => ({
                 value: character.id,
                 text: character.name
@@ -304,14 +282,6 @@ export default {
         editScenario(selectedScenario) {
             this.scenarioToEditOrCreate = this.$store.state.scenarios.scenarios.filter(scenario => scenario.id === selectedScenario.id)[0]
         },
-        deleteScenario(scenario) {
-            console.log(this.selectedPlayer, scenario);
-            this.$store.dispatch('removePlayed', { player_id: this.selectedPlayer, scen_id: scenario.id })
-            // if(confirm(`Are you sure you want to delete ${scenario.title}?`)) {
-            //     this.$store.dispatch('deleteScenario', scenario.id);
-            //     this.selectedSeason = null;
-            // }
-        },
         onSeasonSelection(scenarios) {
             this.totalRows = scenarios.length;
             this.currentPage = 1;
@@ -328,12 +298,18 @@ export default {
             }
         },
         markPlayed(character, player, scenario) {
+            console.log(character, player, scenario);
             this.$store.dispatch('markPlayed', {char_id: character, player_id: player, scen_id: scenario.id});
-        }
-
+        },
+        removePlayed(scenarioId) {
+            this.$store.dispatch('removePlayed', { player_id: this.player_id, scen_id: scenarioId })
+        },
     },
     beforeUpdate() {
-        console.log("UPDATED")
+        console.log("BEFORE UPDATE", this.player_id, this.isLoggedIn);
+    },
+    updated() {
+        console.log("UPDATED", this.player_id, this.isLoggedIn);
     }
 }
 </script>
